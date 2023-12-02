@@ -40,9 +40,9 @@ describe("methods", () => {
             red: [4, 1],
             green: [2, 2]
         }
-        expect(isMinimum(testInput)).toStrictEqual([4,2,6])
-        
-    
+        expect(isMinimum(testInput)).toStrictEqual([4, 2, 6])
+
+
     })
     test("should extract game id", () => {
         const testInput = testInputs[0].split('\n');
@@ -51,67 +51,60 @@ describe("methods", () => {
 })
 
 describe("solutions", () => {
-    test.only("should solve second example task", () => {
-        const lines = testInputs[0].split('\n')
-        lines.map((line) => {
-            // const gameId = extractGameId(line)
-            const colors = extractColors(line)
-            const minimum = isMinimum(colors)
-            console.log(minimum.reduce((acc, curr) => acc * curr, 0));
-            
-            // if (isWithinThreshold(colors, cubeThresholds)) {
-            //     console.log(`Game ${gameId} is within thresholds`)
-            //     return gameId
-            // }
-            // return null
 
-        })
-        expect(validIdList.filter(Boolean).reduce((acc, curr) => acc + curr, 0)).toBe(8)        
-    })
-    
+
     test("should solve first example task", () => {
         const lines = testInputs[0].split('\n')
         const validIdList = lines.map((line) => {
             const gameId = extractGameId(line)
             const colors = extractColors(line)
             if (isWithinThreshold(colors, cubeThresholds)) {
-                console.log(`Game ${gameId} is within thresholds`)
                 return gameId
             }
             return null
 
         })
-        expect(validIdList.filter(Boolean).reduce((acc, curr) => acc + curr, 0)).toBe(8)        
+        expect(validIdList.filter(Boolean).reduce((acc, curr) => acc + curr, 0)).toBe(8)
     })
-    
+
+    test("should solve second example task", () => {
+        const lines = testInputs[0].split('\n')
+        const powerOfCubes:Array<number> = []
+        lines.map((line) => {
+            const colors = extractColors(line)
+            const minimum = isMinimum(colors)
+            powerOfCubes.push(minimum.reduce((acc, curr) => {
+                return acc * curr;
+            }, 1))
+        })
+        expect(powerOfCubes.filter(Boolean).reduce((acc, curr) => acc + curr, 0)).toBe(2286)
+    })
+
     test("should solve first task", () => {
         const lines = input.split('\n')
         const validIdList = lines.map((line) => {
             const gameId = extractGameId(line)
             const colors = extractColors(line)
             if (isWithinThreshold(colors, cubeThresholds)) {
-                console.log(`Game ${gameId} is within thresholds`)
                 return gameId
             }
             return null
 
         })
-        expect(validIdList.filter(Boolean).reduce((acc, curr) => acc + curr, 0)).toBe(2447)        
+        expect(validIdList.filter(Boolean).reduce((acc, curr) => acc + curr, 0)).toBe(2447)
     })
-    test.skip("should solve second task", () => {
+    test("should solve second task", () => {
         const lines = input.split('\n')
-        const listOfPowerOfCubes = lines.map((line) => {
-            // const gameId = extractGameId(line)
+        const powerOfCubes:Array<number> = []
+        lines.map((line) => {
             const colors = extractColors(line)
             const minimum = isMinimum(colors)
-            console.log(minimum)
-            // if (isWithinThreshold(colors, cubeThresholds)) {
-            //     console.log(`Game ${gameId} is within thresholds`)
-            //     return gameId
-            // }
-            // return null
-
+            powerOfCubes.push(minimum.reduce((acc, curr) => {
+                return acc * curr;
+            }, 1))
         })
-        expect(validIdList.filter(Boolean).reduce((acc, curr) => acc + curr, 0)).toBe(0)        
+        expect(powerOfCubes.filter(Boolean).reduce((acc, curr) => {
+            return acc + curr;
+        }, 0)).toBe(56322)
     })
 })
