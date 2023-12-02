@@ -1,110 +1,72 @@
 import fs from 'fs'
 import { describe, expect, test } from "vitest";
-import { extractNumbers, extractNumbersIncludingWords, replaceWordsWithDigits, summarize } from "./src";
+import { extractColors, isWithinThreshold, extractGameId } from "./src/index";
 const input = fs.readFileSync('./src/input.txt', 'utf-8')
 const testInputs = [
-    `1abc2
-pqr3stu8vwx
-a1b2c3d4e5f
-treb7uchet`,
-    `two1nine
-eightwothree
-abcone2threexyz
-xtwone3four
-4nineeightseven2
-zoneight234
-7pqrstsixteen`
+    `Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
+    Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
+    Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
+    Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
+    Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green`,
 ]
-
-
+// nly 12 red cubes, 13 green cubes, and 14 blue cubes
+const cubeThresholds = {
+    red: 12,
+    green: 13,
+    blue: 14
+} as const
 describe("methods", () => {
-    test("should summarize array", () => {
-        expect(summarize(5, 8)).toBe(13)
-    })
-    test("should extract numbers from string", () => {
-        const testResults = [
-            [12, 38, 15, 77],
-            [11, NaN, 22, 33, 42, 24, 77]
-        ]
-        const firstExampleOutput = testInputs[0].split('\n')
-        firstExampleOutput.forEach((line, index) => {
-            expect(extractNumbers(line)).toBe(testResults[0][index])
-        })
-
-
-        const secondExampleOutput = testInputs[1].split('\n')
-        secondExampleOutput.forEach((line, index) => {
-            expect(extractNumbers(line)).toBe(testResults[1][index])
-        })
-
-    })
-    test("should extract numbers and numbers as words from string", () => {
-        const testResults = [
-            [12, 38, 15, 77],
-            [29, 83, 13, 24, 42, 14, 76]
-        ]
-        const firstExampleOutput = testInputs[0].split('\n')
-        firstExampleOutput.forEach((line, index) => {
-            expect(extractNumbersIncludingWords(line)).toBe(testResults[0][index])
-        })
-
-
-        const secondExampleOutput = testInputs[1].split('\n')
-        secondExampleOutput.forEach((line, index) => {
-            expect(extractNumbersIncludingWords(line)).toBe(testResults[1][index])
-        })
-
-    })
-    test("should summarize", () => {
-        const testResults = [
-            [12, 38, 15, 77],
-            [29, 83, 13, 24, 42, 14, 76]
-        ]
-        const firstExampleOutput = testInputs[0].split('\n')
-        firstExampleOutput.forEach((line, index) => {
-            expect(extractNumbersIncludingWords(line)).toBe(testResults[0][index])
-            expect(testResults[0].reduce(summarize, 0)).toBe(142)
-        })
-
-
-        const secondExampleOutput = testInputs[1].split('\n')
-        secondExampleOutput.forEach((line, index) => {
-            expect(extractNumbersIncludingWords(line)).toBe(testResults[1][index])
-            expect(testResults[1].reduce(summarize, 0)).toBe(281)
-        })
-
-    })
-    test("should replace words with digits", () => {
-        const testResults = [
-            29,
-            83,
-            13,
-            24,
-            42,
-            14,
-            76
-        ]
-        expect(replaceWordsWithDigits('one')).toBe('1')
-        expect(replaceWordsWithDigits('oneone')).toBe('11')
-        expect(replaceWordsWithDigits('oneightone')).toBe('11')
-        expect(replaceWordsWithDigits('two4five')).toBe('245')
-        expect(replaceWordsWithDigits('jcb82eightwond')).toBe('828')
-
-        const secondExampleOutput = testInputs[1].split('\n')
-        secondExampleOutput.forEach((line, index) => {
-            // console.log(extractNumbersIncludingWords(line));
-            expect(extractNumbersIncludingWords(line)).toBe(testResults[index])
+    test("should extract color amounts", () => {
+        const testInput = testInputs[0].split('\n')
+        expect(extractColors(testInput[0])).toStrictEqual({
+            blue: [3, 6],
+            red: [4, 1],
+            green: [2, 2]
         })
     })
-
-
+    test("is within threshold", () => {
+        const testInput = {
+            blue: [3, 6],
+            red: [4, 1],
+            green: [2, 2]
+        }
+        expect(isWithinThreshold(testInput, cubeThresholds)).toBe(true)
+        expect(isWithinThreshold(testInput, { red: 1, blue: 20, green: 20 })).toBe(false)
+    })
+    test("should extract game id", () => {
+        const testInput = testInputs[0].split('\n');
+        expect(extractGameId(testInput[0])).toBe(1)
+    })
 })
+
 describe("solutions", () => {
-    const lines = input.split('\n')
-    test("should solve first task", () => {
-        expect(lines.map(extractNumbers).filter(Boolean).reduce(summarize, 0)).toBe(53334)
+    test("should solve example task", () => {
+        const lines = testInputs[0].split('\n')
+        const validIdList = lines.map((line) => {
+            const gameId = extractGameId(line)
+            const colors = extractColors(line)
+            if (isWithinThreshold(colors, cubeThresholds)) {
+                console.log(`Game ${gameId} is within thresholds`)
+                return gameId
+            }
+            return null
+
+        })
+        expect(validIdList.filter(Boolean).reduce((acc, curr) => acc + curr, 0)).toBe(8)        
     })
-    test("should solve second task", () => {
-        expect(lines.map(extractNumbersIncludingWords).filter(Boolean).reduce(summarize, 0)).toBe(55291)
+    
+    test("should solve first task", () => {
+        const lines = input.split('\n')
+        const validIdList = lines.map((line) => {
+            const gameId = extractGameId(line)
+            const colors = extractColors(line)
+            if (isWithinThreshold(colors, cubeThresholds)) {
+                console.log(`Game ${gameId} is within thresholds`)
+                return gameId
+            }
+            return null
+
+        })
+        expect(validIdList.filter(Boolean).reduce((acc, curr) => acc + curr, 0)).toBe(2447)        
     })
 })
