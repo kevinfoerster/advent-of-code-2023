@@ -44,6 +44,12 @@ const isWithinThreshold = (colors: Colors, thresholds: Thresholds) => {
     }).every(Boolean)
 }
 
+const isMinimum = (colors: Colors) => {
+    return Object.keys(colors).map(color => {
+        return Math.max(...colors[color])
+    })
+}
+
 const extractGameId = (input: string) => {
     const regex = /Game\s[0-9]+/g
     const matches = input.match(regex)
@@ -51,4 +57,4 @@ const extractGameId = (input: string) => {
 }
 
 
-export { extractColors, isWithinThreshold, extractGameId }
+export { extractColors, isWithinThreshold, extractGameId, isMinimum }

@@ -1,6 +1,6 @@
 import fs from 'fs'
 import { describe, expect, test } from "vitest";
-import { extractColors, isWithinThreshold, extractGameId } from "./src/index";
+import { extractColors, isWithinThreshold, extractGameId, isMinimum } from "./src/index";
 const input = fs.readFileSync('./src/input.txt', 'utf-8')
 const testInputs = [
     `Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green
@@ -33,6 +33,17 @@ describe("methods", () => {
         expect(isWithinThreshold(testInput, cubeThresholds)).toBe(true)
         expect(isWithinThreshold(testInput, { red: 1, blue: 20, green: 20 })).toBe(false)
     })
+
+    test.skip("is minimum number of cubes", () => {
+        const testInput = {
+            blue: [3, 6],
+            red: [4, 1],
+            green: [2, 2]
+        }
+        expect(isMinimum(testInput)).toStrictEqual([4,2,6])
+        
+    
+    })
     test("should extract game id", () => {
         const testInput = testInputs[0].split('\n');
         expect(extractGameId(testInput[0])).toBe(1)
@@ -40,7 +51,25 @@ describe("methods", () => {
 })
 
 describe("solutions", () => {
-    test("should solve example task", () => {
+    test.only("should solve second example task", () => {
+        const lines = testInputs[0].split('\n')
+        lines.map((line) => {
+            // const gameId = extractGameId(line)
+            const colors = extractColors(line)
+            const minimum = isMinimum(colors)
+            console.log(minimum.reduce((acc, curr) => acc * curr, 0));
+            
+            // if (isWithinThreshold(colors, cubeThresholds)) {
+            //     console.log(`Game ${gameId} is within thresholds`)
+            //     return gameId
+            // }
+            // return null
+
+        })
+        expect(validIdList.filter(Boolean).reduce((acc, curr) => acc + curr, 0)).toBe(8)        
+    })
+    
+    test("should solve first example task", () => {
         const lines = testInputs[0].split('\n')
         const validIdList = lines.map((line) => {
             const gameId = extractGameId(line)
@@ -68,5 +97,21 @@ describe("solutions", () => {
 
         })
         expect(validIdList.filter(Boolean).reduce((acc, curr) => acc + curr, 0)).toBe(2447)        
+    })
+    test.skip("should solve second task", () => {
+        const lines = input.split('\n')
+        const listOfPowerOfCubes = lines.map((line) => {
+            // const gameId = extractGameId(line)
+            const colors = extractColors(line)
+            const minimum = isMinimum(colors)
+            console.log(minimum)
+            // if (isWithinThreshold(colors, cubeThresholds)) {
+            //     console.log(`Game ${gameId} is within thresholds`)
+            //     return gameId
+            // }
+            // return null
+
+        })
+        expect(validIdList.filter(Boolean).reduce((acc, curr) => acc + curr, 0)).toBe(0)        
     })
 })
